@@ -1,0 +1,154 @@
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eisenhower Matrix To-Do List</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      background-color: #f0f0f0;
+      color: #333;
+    }
+
+    #app {
+      display: flex;
+      gap: 20px;
+      width: 80%;
+      height: 70%;
+      max-width: 1600px;
+      max-height: 900px;
+    }
+
+    .todo-bank, .completed-tasks {
+      width: 20%;
+      background-color: #ffffff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 10px;
+      flex-grow: 1;
+      width: 60%;
+      height: 100%;
+    }
+
+    .matrix-cell {
+      background-color: #f9f9f9;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      overflow-y: auto;
+      border: 2px dashed #ccc;
+    }
+
+    .matrix-cell:nth-child(1) { background-color: #f1f8e9; }
+    .matrix-cell:nth-child(2) { background-color: #e1f5fe; }
+    .matrix-cell:nth-child(3) { background-color: #fff3e0; }
+    .matrix-cell:nth-child(4) { background-color: #fce4ec; }
+
+    .title {
+      font-weight: bold;
+      font-size: 1.5em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .task-tile {
+      padding: 10px;
+      background-color: #e7e7e7;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 5px;
+      box-sizing: border-box;
+      position: relative;
+      width: 200px; /* Fixed width */
+      max-width: 200px; /* Ensures no larger than 200px */
+      word-wrap: break-word;
+    }
+
+    .task-tile span {
+      cursor: text;
+      flex-grow: 1;
+      padding: 0 5px;
+      min-width: 20px;
+      word-wrap: break-word;
+      max-width: calc(100% - 90px); /* Ensure more space for text padding */
+    }
+
+    .delete-btn {
+      font-weight: bold;
+      color: #888;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      font-size: 12px;
+    }
+
+    .delete-btn:hover {
+      color: red;
+    }
+
+    .task-tile .delete-container {
+      position: absolute;
+      top: 50%;
+      right: 10px; /* Align the X icon to the right margin with padding */
+      transform: translateY(-50%); /* Vertically center the X */
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- To-do bank -->
+    <div class="todo-bank">
+      <h3>To-Do Bank</h3>
+      <input type="text" id="taskInput" placeholder="Add new task" onkeypress="handleKeyPress(event)">
+      <button onclick="addTask()">Add Task</button>
+      <div id="taskBank"></div>
+    </div>
+
+    <!-- Eisenhower matrix -->
+    <div class="matrix">
+      <div class="matrix-cell" data-category="urgent-important" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <div class="title">Urgent & Important</div>
+      </div>
+      <div class="matrix-cell" data-category="not-urgent-important" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <div class="title">Not Urgent & Important</div>
+      </div>
+      <div class="matrix-cell" data-category="urgent-not-important" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <div class="title">Urgent & Not Important</div>
+      </div>
+      <div class="matrix-cell" data-category="not-urgent-not-important" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <div class="title">Not Urgent & Not Important</div>
+      </div>
+    </div>
+
+    <!-- Completed tasks -->
+    <div class="completed-tasks">
+      <h3>Completed Tasks</h3>
+      <div id="completedList"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
