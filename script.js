@@ -1,4 +1,4 @@
-// Save the state of tasks in localStorage
+// Save tasks
 function saveTasks() {
   const todoBank = document.getElementById("taskBank").innerHTML;
   const completedTasks = document.getElementById("completedList").innerHTML;
@@ -9,7 +9,7 @@ function saveTasks() {
   localStorage.setItem("matrixCells", JSON.stringify(matrixCells));
 }
 
-// Load tasks from localStorage
+// Load tasks
 function loadTasks() {
   const todoBank = localStorage.getItem("todoBank");
   const completedTasks = localStorage.getItem("completedTasks");
@@ -24,10 +24,6 @@ function loadTasks() {
   }
 }
 
-// Add event listener to save on window unload
-window.addEventListener("beforeunload", saveTasks);
-window.addEventListener("DOMContentLoaded", loadTasks);
-
 // Add task
 function addTask() {
   const taskInput = document.getElementById("taskInput");
@@ -40,20 +36,22 @@ function addTask() {
 }
 
 // Create task tile
-function createTaskTile(text) {
+function createTaskTile(text, isCompleted = false) {
   const taskTile = document.createElement("div");
-  taskTile.className = "task-tile";
+  taskTile.className = `task-tile ${isCompleted ? "completed" : ""}`;
   taskTile.draggable = true;
   taskTile.ondragstart = drag;
 
-  const taskCheckbox = document.createElement("input");
-  taskCheckbox.type = "checkbox";
-  taskCheckbox.onclick = () => taskTile.remove();
-  taskTile.appendChild(taskCheckbox);
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = isCompleted;
+  checkbox.onclick = () => toggleTaskCompletion(taskTile, checkbox.checked);
+  taskTile.appendChild(checkbox);
 
   const taskText = document.createElement("span");
-  taskText.contentEditable = true;
   taskText.textContent = text;
+  taskText.ondblclick = () => (taskText.contentEditable = true);
+  taskText.onblur = () => (taskText.contentEditable = false);
   taskTile.appendChild(taskText);
 
   const deleteBtn = document.createElement("span");
@@ -65,7 +63,14 @@ function createTaskTile(text) {
   return taskTile;
 }
 
-// Drag-and-drop functionality
+// Toggle task completion
+function toggleTaskCompletion(taskTile, isCompleted) {
+  const parent = isCompleted ? document.getElementById("completedList") : document.getElementById("taskBank");
+  taskTile.classList.toggle("completed", isCompleted);
+  parent.appendChild(taskTile);
+}
+
+// Drag-and-drop
 function allowDrop(event) {
   event.preventDefault();
 }
@@ -76,16 +81,18 @@ function drag(event) {
 
 function drop(event) {
   event.preventDefault();
-  const droppedHTML = event.dataTransfer.getData("text");
+  const draggedHTML = event.dataTransfer.getData("text");
   const tempContainer = document.createElement("div");
-  tempContainer.innerHTML = droppedHTML;
-  const droppedElement = tempContainer.firstChild;
-  if (!event.target.closest(".matrix-cell").querySelector(`[data-id="${droppedElement.dataset.id}"]`)) {
-    event.target.closest(".matrix-cell").appendChild(droppedElement);
-  }
+  tempContainer.innerHTML = draggedHTML;
+  const draggedElement = tempContainer.firstChild;
+  event.target.closest(".matrix-cell").appendChild(draggedElement);
 }
 
-// Add task on pressing Enter
+// Add task on Enter
 function handleKeyPress(event) {
   if (event.key === "Enter") addTask();
 }
+
+// Save on unload
+window.addEventListener("beforeunload", saveTasks);
+window.addEventListener("DOMContentLoaded", loadTasks);
