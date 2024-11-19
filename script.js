@@ -46,7 +46,13 @@ function createTaskTile(text) {
   taskTile.draggable = true;
   taskTile.ondragstart = drag;
 
+  const taskCheckbox = document.createElement("input");
+  taskCheckbox.type = "checkbox";
+  taskCheckbox.onclick = () => taskTile.remove();
+  taskTile.appendChild(taskCheckbox);
+
   const taskText = document.createElement("span");
+  taskText.contentEditable = true;
   taskText.textContent = text;
   taskTile.appendChild(taskText);
 
@@ -54,10 +60,7 @@ function createTaskTile(text) {
   deleteBtn.className = "delete-btn";
   deleteBtn.textContent = "X";
   deleteBtn.onclick = () => taskTile.remove();
-  const deleteContainer = document.createElement("div");
-  deleteContainer.className = "delete-container";
-  deleteContainer.appendChild(deleteBtn);
-  taskTile.appendChild(deleteContainer);
+  taskTile.appendChild(deleteBtn);
 
   return taskTile;
 }
@@ -74,7 +77,12 @@ function drag(event) {
 function drop(event) {
   event.preventDefault();
   const droppedHTML = event.dataTransfer.getData("text");
-  event.target.closest(".matrix-cell").innerHTML += droppedHTML;
+  const tempContainer = document.createElement("div");
+  tempContainer.innerHTML = droppedHTML;
+  const droppedElement = tempContainer.firstChild;
+  if (!event.target.closest(".matrix-cell").querySelector(`[data-id="${droppedElement.dataset.id}"]`)) {
+    event.target.closest(".matrix-cell").appendChild(droppedElement);
+  }
 }
 
 // Add task on pressing Enter
